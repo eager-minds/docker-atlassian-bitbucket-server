@@ -26,6 +26,22 @@ JAVA_OPTS="${JAVA_OPTS} ${CATALINA_OPTS}"
 
 ARGS="$@"
 
+if [ ! -f "$BITBUCKET_HOME/shared/bitbucket.properties" ]; then
+   mkdir -p $BITBUCKET_HOME/shared
+   touch $BITBUCKET_HOME/shared/bitbucket.properties
+fi
+
+if [ -n "${CATALINA_CONNECTOR_PROXYNAME}" ]; then
+    echo "server.proxy-name=${CATALINA_CONNECTOR_PROXYNAME}" >> $BITBUCKET_HOME/shared/bitbucket.properties
+fi
+if [ -n "${CATALINA_CONNECTOR_PROXYPORT}" ]; then
+    echo "server.proxy-port=${CATALINA_CONNECTOR_PROXYPORT}" >> $BITBUCKET_HOME/shared/bitbucket.properties
+fi
+if [ "${CATALINA_CONNECTOR_SCHEME}" = "https" ]; then
+    echo "server.scheme=${CATALINA_CONNECTOR_SCHEME}" >> $BITBUCKET_HOME/shared/bitbucket.properties
+    echo "server.secure=${CATALINA_CONNECTOR_SECURE}" >> $BITBUCKET_HOME/shared/bitbucket.properties
+fi
+
 # Start Bitbucket without Elasticsearch
 if [ "${ELASTICSEARCH_ENABLED}" == "false" ] || [ "${APPLICATION_MODE}" == "mirror" ]; then
     ARGS="--no-search ${ARGS}"
